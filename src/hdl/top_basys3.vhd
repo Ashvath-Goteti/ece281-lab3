@@ -84,12 +84,53 @@ entity top_basys3 is
 end top_basys3;
 
 architecture top_basys3_arch of top_basys3 is 
+    component thunderbird_fsm is
+        port(
+            f_Q: in std_logic_vector(7 downto 0);
+            f_Q_next: in std_logic_vector(7 downto 0)
+            );
+    end component thunderbird_fsm;
+    
+    component clock_divider is
+        generic ( constant k_DIV : natural := 2    );
+        port (     i_clk    : in std_logic;           -- basys3 clk
+                i_reset  : in std_logic;           -- asynchronous
+                o_clk    : out std_logic           -- divided (slow) clock
+        );
+    end component clock_divider;
+    
+        signal w_clk : std_logic;
+between o_clk and stoplight clk
   
 	-- declare components
 
   
 begin
+thunderbird_fsm_inst: thunderbird_fsm
+    port map(
+        i_clk => w_clk,
+        i_reset => btnR,
+        i_left => sw(15),
+        i_right => sw(0),
+        o_lights_L(0) => led(13),
+        o_lights_L(1) => led(14),
+        o_lights_L(2) => led(15),
+        o_lights_R(0) => led(2),
+        o_lights_R(1) => led(1),
+        o_lights_L(2) => led(0)
+        );
+        
+        clkdiv_inst : clock_divider 		--instantiation of clock_divider to take 
+                generic map ( k_DIV => 12500000 ) -- 1 Hz clock from 100 MHz
+                port map (                          
+                    i_clk   => clk,
+                    i_reset => btnL,
+                    o_clk   => w_clk
+                );    
+        
+
 	-- PORT MAPS ----------------------------------------
+	
 
 	
 	
